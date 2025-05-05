@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Foto/Video</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <h2>Upload Foto/Video & Backsound</h2>
+
+  <form id="editForm" enctype="multipart/form-data">
+    <label>Foto/Video:</label>
+    <input type="file" name="media" accept="image/*,video/*" required><br>
+
+    <label>Backsound (MP3):</label>
+    <input type="file" name="audio" accept="audio/*"><br>
+
+    <label>Durasi Foto (detik):</label>
+    <input type="number" name="duration" min="1" value="5"><br>
+
+    <button type="submit">Proses</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    document.getElementById('editForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+
+      const res = await fetch('/api/editor', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+
+      const resultDiv = document.getElementById('result');
+      if (data.outputUrl) {
+        resultDiv.innerHTML = `
+          <h3>Preview:</h3>
+          <video controls src="${data.outputUrl}"></video>
+          <br>
+          <a href="${data.outputUrl}" download>Download Hasil</a>
+        `;
+      } else {
+        resultDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
